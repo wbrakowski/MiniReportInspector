@@ -1,19 +1,20 @@
-codeunit 50100 "DataSetExportHelper"
+codeunit 50100 "Dataset Export Mgt."
 {
     SingleInstance = true;
     procedure OpenRequestPageForDatasetExport(ReportIDasIntegerOrText: Variant)
     var
         ReportID: Integer;
-        RequestPageParams: text;
-        Selection: text;
+        RequestPageParams: Text;
+        Selection: Text;
+        InvalidReportErr: Label 'Invalid ReportID "%1"';
     begin
         if not TryFindReportID(ReportIDasIntegerOrText, ReportID) then
-            Error('Invalid ReportID "%1"', ReportIDasIntegerOrText);
+            Error(InvalidReportErr, ReportIDasIntegerOrText);
         SetRunReqPageMode(true);
         RequestPageParams := Report.RunRequestPage(ReportID);
         SetRunReqPageMode(false);
-        Selection := copystr(RequestPageParams, Strpos(RequestPageParams, '<Field name="ExportDatasetOptions">') + 35, 1);
-        Case Selection of
+        Selection := CopyStr(RequestPageParams, Strpos(RequestPageParams, '<Field name="ExportDatasetOptions">') + 35, 1);
+        case Selection of
             '0':
                 exit;
             '1':
@@ -46,7 +47,7 @@ codeunit 50100 "DataSetExportHelper"
         end;
     end;
 
-    local procedure TryFindReportID(ReportIDasIntegerOrText: Variant; var ReportID: Integer) Found: boolean
+    local procedure TryFindReportID(ReportIDasIntegerOrText: Variant; var ReportID: Integer) Found: Boolean
     begin
         if ReportIDasIntegerOrText.IsInteger then
             ReportID := ReportIDasIntegerOrText;
@@ -74,7 +75,7 @@ codeunit 50100 "DataSetExportHelper"
             Name := GetXMLAttrValue(XField, 'Name');
             ColumnNames.Add(Name);
         end;
-        Found := ColumnNames.Count > 0;
+        Found := ColumnNames.Count() > 0;
     end;
 
     procedure DownloadDataSetExcel(ColumnNames: List of [Text]; Lines: List of [List of [Text]]);
@@ -143,7 +144,7 @@ codeunit 50100 "DataSetExportHelper"
                 else
                     XField := XmlElement.Create(ColName).AsXmlNode();
                 if XField.IsXmlElement then
-                    if not XField.AsXmlElement().IsEmpty then
+                    if not XField.AsXmlElement().IsEmpty() then
                         XResult.AsXmlElement().Add(XField);
             end;
         end;
@@ -180,16 +181,16 @@ codeunit 50100 "DataSetExportHelper"
         FileMgt: Codeunit "File Management";
         IsDownloaded: Boolean;
         InStr: InStream;
-        Path: text;
-        OutExt: text;
-        AllFilesDescriptionTxt: TextConst DEU = 'Alle Dateien (*.*)|*.*', ENU = 'All Files (*.*)|*.*';
-        ExcelFileTypeTok: TextConst DEU = 'Excel-Dateien (*.xlsx)|*.xlsx', ENU = 'Excel Files (*.xlsx)|*.xlsx';
-        ExportLbl: TextConst DEU = 'Export', ENU = 'Export';
-        RDLFileTypeTok: TextConst DEU = 'SQL Report Builder (*.rdl;*.rdlc)|*.rdl;*.rdlc', ENU = 'SQL Report Builder (*.rdl;*.rdlc)|*.rdl;*.rdlc';
-        TXTFileTypeTok: TextConst DEU = 'Textdateien (*.txt)|*.txt', ENU = 'Text Files (*.txt)|*.txt';
-        XMLFileTypeTok: TextConst DEU = 'XML-Dateien (*.xml)|*.xml', ENU = 'XML Files (*.xml)|*.xml';
+        Path: Text;
+        OutExt: Text;
+        AllFilesDescriptionTxt: Label 'All Files (*.*)|*.*';
+        ExcelFileTypeTok: Label 'Excel Files (*.xlsx)|*.xlsx';
+        ExportLbl: Label 'Export';
+        RDLFileTypeTok: Label 'SQL Report Builder (*.rdl;*.rdlc)|*.rdl;*.rdlc';
+        TXTFileTypeTok: Label 'Text Files (*.txt)|*.txt';
+        XMLFileTypeTok: Label 'XML Files (*.xml)|*.xml';
     begin
-        CASE UPPERCASE(FileMgt.GetExtension(FileName)) OF
+        case UPPERCASE(FileMgt.GetExtension(FileName)) of
             'XLSX':
                 OutExt := ExcelFileTypeTok;
             'XML':
@@ -198,17 +199,17 @@ codeunit 50100 "DataSetExportHelper"
                 OutExt := TXTFileTypeTok;
             'RDL', 'RDLC':
                 OutExt := RDLFileTypeTok;
-        END;
-        IF OutExt = '' THEN
+        end;
+        if OutExt = '' then
             OutExt := AllFilesDescriptionTxt
         else
             OutExt += '|' + AllFilesDescriptionTxt;
 
         TenantMedia.Content.CreateInStream(InStr);
         IsDownloaded := DOWNLOADFROMSTREAM(InStr, ExportLbl, Path, OutExt, FileName);
-        if IsDownloaded THEN
-            EXIT(FileName);
-        EXIT('');
+        if IsDownloaded then
+            exit(FileName);
+        exit('');
     end;
 
     procedure SetRunReqPageMode(IsRunRequestPageModeNEW: Boolean);
@@ -222,13 +223,13 @@ codeunit 50100 "DataSetExportHelper"
         exit(IsRunRequestPageMode);
     end;
 
-    procedure GetXMLAttrValue(XNode: XmlNode; AttrName: text) AttrValue: Text
+    procedure GetXMLAttrValue(XNode: XmlNode; AttrName: Text) AttrValue: Text
     begin
         if not GetXMLAttrVal(XNode, AttrName, AttrValue) then
             exit('');
     end;
 
-    procedure GetXMLAttrVal(XNode: XmlNode; AttrName: text; var AttrValue: Text) OK: Boolean
+    procedure GetXMLAttrVal(XNode: XmlNode; AttrName: Text; var AttrValue: Text) OK: Boolean
     var
         AttrNode: XmlAttribute;
     begin
@@ -269,14 +270,14 @@ codeunit 50100 "DataSetExportHelper"
         Col: XmlNode;
         Line: List of [Text];
         ListCount: Integer;
-        DebugText: text;
+        DebugText: Text;
         DebugText2: TextBuilder;
         DebugLineCount: Integer;
     begin
         // Foreach Dataitem without child Dataitems
         case true of
             DataSetXML.SelectNodes('//DataItem', XNodeList):
-                ListCount := XnodeList.Count;
+                ListCount := XnodeList.Count();
         end;
         foreach XNode_InnerDataItem in XNodeList do begin
 
@@ -288,7 +289,7 @@ codeunit 50100 "DataSetExportHelper"
                 // New Line
                 Clear(Line);
                 XNode_InnerDataItem.SelectNodes('ancestor-or-self::DataItem', Ancestors);
-                ListCount := Ancestors.Count;
+                ListCount := Ancestors.Count();
                 foreach Ancestor in Ancestors do begin
                     // If dataitem has columns
                     if Ancestor.SelectNodes('child::*', Columns) then
@@ -302,7 +303,7 @@ codeunit 50100 "DataSetExportHelper"
                                         end;
                 end;
                 //Save line to data table
-                if Line.Count > 0 then
+                if Line.Count() > 0 then
                     Lines.Add(Line);
             end;
         end;
@@ -337,7 +338,7 @@ codeunit 50100 "DataSetExportHelper"
         // Zero or empty <DataItems /> are accepted
         IsLeafDataItem := XDataItemsBelow.Count = 0;
         XDataItem.SelectNodes('./Columns', XColumns);
-        DataItemHasColumns := XColumns.Count > 0;
+        DataItemHasColumns := XColumns.Count() > 0;
         case true of
             IsTopLevelDataItem and not IsLeafDataItem:
                 exit(false);
@@ -349,7 +350,7 @@ codeunit 50100 "DataSetExportHelper"
         exit(true);
     end;
 
-    procedure AddColumnToLine(var Line: List of [text]; ColumnNames: List of [Text]; Col: XmlNode)
+    procedure AddColumnToLine(var Line: List of [Text]; ColumnNames: List of [Text]; Col: XmlNode)
     var
         ColName: Text;
         ColValue: Text;
@@ -359,24 +360,26 @@ codeunit 50100 "DataSetExportHelper"
         DecimalValue: Decimal;
         ColPosFormat: Integer;
         debug: Integer;
+        UnknownFormatColErr: Label 'unknown FormatColumn %1';
+        UnknownColErr: Label 'unknown Column %1';
     begin
         // Init List - List.Insert needs existing element
-        If Line.Count = 0 then
+        if Line.Count = 0 then
             foreach ColName in ColumnNames do begin
                 Line.Add('');
             end;
-        debug := Line.Count;
+        debug := Line.Count();
 
         // Add Name and Values to Line
         //<Column name="BalanceLCY" decimalformatter="#,##0.00">0</Column>                                        
         ColName := GetXMLAttrValue(Col, 'name');
         ColPos := ColumnNames.IndexOf(ColName);
         ColValue := Col.AsXmlElement().InnerText;
-        If GetXMLAttrVal(Col, 'decimalformatter', ColValueFormat) then
-            if evaluate(DecimalValue, ColValue) then
+        if GetXMLAttrVal(Col, 'decimalformatter', ColValueFormat) then
+            if Evaluate(DecimalValue, ColValue) then
                 ColValue := Format(DecimalValue, 0, 9);
         if ColPos = 0 then
-            Error('unknown Column %1', ColName);
+            Error(UnknownColErr, ColName);
         Line.Insert(ColPos, ColValue);
 
         if GetXMLAttrVal(Col, 'decimalformatter', ColValueFormat) then begin
@@ -385,8 +388,31 @@ codeunit 50100 "DataSetExportHelper"
             ColPosFormat := ColumnNames.IndexOf(ColNameFormat);
 
             if ColPosFormat = 0 then
-                Error('unknown FormatColumn %1', ColNameFormat);
+                Error(UnknownFormatColErr, ColNameFormat);
             Line.Insert(ColPosFormat, ColValueFormat);
+        end;
+    end;
+
+    internal procedure RunReportInspector(ReportLayoutSelection: Record "Report Layout Selection")
+    var
+        ReqPageParams: Text;
+        ReportSaveAsXMLResult: XmlDocument;
+        ColumnNames: List of [Text];
+        Lines: List of [List of [Text]];
+        Choice: Integer;
+    begin
+        ReqPageParams := Report.RunRequestPage(ReportLayoutSelection."Report ID");
+        ReportSaveAsXMLResult := GetReportDatasetXML(ReportLayoutSelection."Report ID", ReqPageParams);
+        TryFindColumnNamesInRDLCLayout(ReportLayoutSelection."Report ID", ColumnNames);
+        TransformToTableLayoutXML(ReportSaveAsXMLResult, ColumnNames, Lines);
+        Choice := StrMenu('ResultSet XML,ReportSaveAs XML,Excel');
+        case Choice of
+            1:
+                DownloadResultSetXML(ColumnNames, Lines);
+            2:
+                DownloadReportSaveAsXMLResult(ReportSaveAsXMLResult);
+            3:
+                DownloadDataSetExcel(ColumnNames, Lines);
         end;
     end;
 

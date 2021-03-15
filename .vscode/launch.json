@@ -2,38 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "http://bc14/NAV/",
             "type": "al",
             "request": "launch",
-            "server": "http://bc14/",
-            "serverInstance": "NAV",
+            "name": "X",
+            "server": "https://swarm-vdxjecax.westeurope.cloudapp.azure.com",
+            "serverInstance": "0ae8711481b3dev",
+            "port": 443,
             "authentication": "UserPassword",
-            "breakOnError": true,
-            //"breakOnRecordWrite": false,
-            "launchBrowser": true,
-            "enableSqlInformationDebugger": true,
-            "enableLongRunningSqlStatements": true,
-            "longRunningSqlStatementsThreshold": 500,
-            "numberOfSqlStatements": 10,
+            "startupObjectId": 22,
             "startupObjectType": "Page",
-            "startupObjectId": 9652,            
-        },
-        {
-            "name": "http://bc17/BC/",
-            "type": "al",
-            "request": "launch",
-            "server": "http://bc17/",
-            "serverInstance": "BC",
-            "authentication": "UserPassword",
+            "tenant": "default",
             "breakOnError": true,
-            //"breakOnRecordWrite": false,
             "launchBrowser": true,
-            "enableSqlInformationDebugger": true,
             "enableLongRunningSqlStatements": true,
-            "longRunningSqlStatementsThreshold": 500,
-            "numberOfSqlStatements": 10,
-            "startupObjectType": "Page",
-            "startupObjectId": 9652,            
-        }        
-        ]
+            "enableSqlInformationDebugger": true
+        }
+    ]
 }

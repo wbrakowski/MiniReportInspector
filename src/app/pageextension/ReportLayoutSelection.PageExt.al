@@ -13,30 +13,11 @@ pageextension 50101 "ReportLayoutSelection" extends "Report Layout Selection"
                 PromotedCategory = "Report";
                 trigger OnAction()
                 var
-                    ReqPageParams: Text;
-                    ReportSaveAsXMLResult: XmlDocument;
-                    ColumnNames: List of [Text];
-                    Lines: List of [List of [Text]];
-                    Choice: Integer;
+                    DatasetExportMgt: Codeunit "Dataset Export Mgt.";
                 begin
-                    ReqPageParams := Report.RunRequestPage(Rec."Report ID");
-                    ReportSaveAsXMLResult := DataSetExportHelper.GetReportDatasetXML(Rec."Report ID", ReqPageParams);
-                    DataSetExportHelper.TryFindColumnNamesInRDLCLayout(Rec."Report ID", ColumnNames);
-                    DataSetExportHelper.TransformToTableLayoutXML(ReportSaveAsXMLResult, ColumnNames, Lines);
-                    Choice := StrMenu('ResultSet XML,ReportSaveAs XML,Excel');
-                    case Choice of
-                        1:
-                            DataSetExportHelper.DownloadResultSetXML(ColumnNames, Lines);
-                        2:
-                            DataSetExportHelper.DownloadReportSaveAsXMLResult(ReportSaveAsXMLResult);
-                        3:
-                            DataSetExportHelper.DownloadDataSetExcel(ColumnNames, Lines);
-                    end;
+                    DatasetExportMgt.RunReportInspector(Rec);
                 end;
             }
         }
     }
-
-    var
-        DataSetExportHelper: Codeunit DataSetExportHelper;
 }

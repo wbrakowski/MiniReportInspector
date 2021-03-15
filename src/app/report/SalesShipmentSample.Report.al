@@ -449,7 +449,7 @@ report 50101 "SalesShipmentSample" // Report 208 Sales Shipment BC14
                         Visible = not IsRunRequestPageMode;
                         trigger OnValidate()
                         begin
-                            DataSetExportHelper.OpenRequestPageForDatasetExport(CurrReport.ObjectId(false));
+                            DatasetExportMgt.OpenRequestPageForDatasetExport(CurrReport.ObjectId(false));
                             ExportDataSet := false;
                         end;
                     }
@@ -479,7 +479,7 @@ report 50101 "SalesShipmentSample" // Report 208 Sales Shipment BC14
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            IsRunRequestPageMode := DataSetExportHelper.GetRunReqPageMode();
+            IsRunRequestPageMode := DatasetExportMgt.GetRunReqPageMode();
             //-------------------------------------------------------------------------            
         end;
     }
@@ -589,7 +589,7 @@ report 50101 "SalesShipmentSample" // Report 208 Sales Shipment BC14
         DataItemCounter: Integer;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     var
-        DataSetExportHelper: Codeunit DataSetExportHelper;
+        DatasetExportMgt: Codeunit "Dataset Export Mgt.";
         ExportDatasetOptions: Option "Select an export format","ResultSet XML","ReportSaveAs XML","Excel";
         [InDataSet]
         IsRunRequestPageMode: Boolean;
@@ -653,4 +653,3 @@ report 50101 "SalesShipmentSample" // Report 208 Sales Shipment BC14
         exit(DataItemCounter);
     end;
 }
-

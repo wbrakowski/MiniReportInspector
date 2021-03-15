@@ -1,8 +1,8 @@
 {
   "id": "16ba6f2a-b514-4dfa-8a4c-009e54715cc8",
-  "name": "MiniReportInspector",
+  "name": "Mini Report Inspector",
   "publisher": "Default publisher",
-  "version": "1.0.0.3",
+  "version": "1.0.0.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -11,8 +11,8 @@
   "url": "",
   "logo": "",
   "screenshots": [],
-  "platform": "14.0.0.0",
-  "application": "14.0.0.0",
+  "platform": "16.0.0.0",
+  "application": "16.0.0.0",
   "idRanges": [
     {
       "from": 50100,
@@ -20,6 +20,6 @@
     }
   ],
   "showMyCode": true,
-  "runtime": "3.2",
-  "target": "Internal"
+  "runtime": "5.0",
+  "target": "Cloud"
 }
